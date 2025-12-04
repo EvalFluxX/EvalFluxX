@@ -1,13 +1,15 @@
 # EvalFluxX Maven Plugin
 
-EvalFluxX ist ein minimaler Startpunkt für zukünftige Evaluierungs-Features in Maven-Builds. Das Plugin stellt ein einziges Goal `run` bereit, das im Standardfall in der `verify`-Phase ausgeführt wird und derzeit eine einfache Konsolenausgabe erzeugt.
+EvalFluxX definiert eine neue Maven-Lifecycle-Phase `rag-evaluation` und ordnet sie dem Plugin-Goal `evalfluxx:run` zu.
+Projekte, die das Plugin als Extension einbinden, können so Evaluierungsprozesse direkt im Build-Lifecycle ausführen.
 
 ## Projektstruktur
 ```
 evalfluxx/
-├─ pom.xml
-├─ src/main/java/dev/evalfluxx/mojo/EvalFluxXMojo.java
-└─ src/main/resources/META-INF/maven/ (wird automatisch generiert)
+    pom.xml
+    src/main/java/dev/evalfluxx/mojo/EvalFluxXMojo.java
+    src/main/resources/META-INF/maven/lifecycle.xml
+    README.md
 ```
 
 ## Voraussetzungen
@@ -15,17 +17,44 @@ evalfluxx/
 - Maven 3.9+
 
 ## Build
-Baue und installiere das Plugin lokal:
+Installiere das Plugin lokal:
 
 ```bash
 mvn clean install
 ```
 
 ## Verwendung
-Führe das Goal `run` in einem beliebigen Maven-Projekt aus:
+Binde das Plugin als Extension in einem Projekt ein:
 
-```bash
-mvn dev.evalfluxx:evalfluxx:1.0.0:run
+```xml
+<build>
+  <extensions>
+    <extension>
+      <groupId>dev.evalfluxx</groupId>
+      <artifactId>evalfluxx</artifactId>
+      <version>1.0.0</version>
+    </extension>
+  </extensions>
+  <plugins>
+    <plugin>
+      <groupId>dev.evalfluxx</groupId>
+      <artifactId>evalfluxx</artifactId>
+      <version>1.0.0</version>
+    </plugin>
+  </plugins>
+</build>
 ```
 
-Die Ausführung gibt aktuell eine kurze Meldung im Build-Log aus und dient als Erweiterungspunkt für künftige Evaluierungsschritte.
+Auslösen der Phase direkt:
+
+```bash
+mvn rag-evaluation
+```
+
+Als Teil des Standard-Lifecycles (z. B. `verify`):
+
+```bash
+mvn verify
+```
+
+Das Goal `evalfluxx:run` wird in beiden Fällen im Rahmen der neuen Phase `rag-evaluation` ausgeführt.
