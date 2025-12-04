@@ -23,6 +23,16 @@ Installiere das Plugin lokal:
 mvn clean install
 ```
 
+## Continuous Integration
+
+Dieses Repository ist so eingerichtet, dass die GitHub Actions CI den Build mit Java 21 (Temurin) ausführt. Die Workflow-Datei befindet sich unter `.github/workflows/ci.yml` und führt bei Push/PR gegen `main` einen `mvn verify`-Build mit Java 21 aus.
+
+Lokale Hinweise (Windows): stelle sicher, dass JDK 21 installiert und in PATH ist. Beispiel mit Chocolatey:
+
+```powershell
+choco install temurin21 -y
+```
+
 ## Verwendung
 Binde das Plugin als Extension in einem Projekt ein:
 
