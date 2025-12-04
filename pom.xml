@@ -8,7 +8,7 @@
     <packaging>maven-plugin</packaging>
 
     <name>EvalFluxX Maven Plugin</name>
-    <description>Baseline Maven plugin to support future evaluation workflows.</description>
+    <description>Maven plugin that introduces a rag-evaluation lifecycle phase for evaluation workflows.</description>
     <url>https://example.com/evalfluxx</url>
 
     <properties>
@@ -34,11 +34,21 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>${maven.plugin.plugin.version}</version>
+                <extensions>true</extensions>
                 <executions>
                     <execution>
                         <id>default-descriptor</id>

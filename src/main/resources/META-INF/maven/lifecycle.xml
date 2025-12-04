@@ -1,0 +1,11 @@
+<lifecycles>
+  <lifecycle>
+    <id>eval-lifecycle</id>
+    <phases>
+      <phase>
+        <id>rag-evaluation</id>
+        <goal>evalfluxx:run</goal>
+      </phase>
+    </phases>
+  </lifecycle>
+</lifecycles>
