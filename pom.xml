@@ -10,7 +10,6 @@
 
     <name>EvalFluxX Maven Plugin</name>
     <description>Maven plugin that introduces a rag-evaluation lifecycle phase for evaluation workflows.</description>
-    <url>https://example.com/evalfluxx</url>
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
