@@ -1,33 +1,69 @@
 package dev.evalfluxx.mojo;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import java.util.Collections;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EvalFluxXMojoTest {
 
-    @Test
-    void verifyWithoutFlagSkipsEvaluation() {
-        boolean shouldRun = EvalFluxXMojo.shouldRunEvaluation(List.of("verify"), false);
+    @TempDir
+    Path tempDir;
 
-        assertFalse(shouldRun, "Evaluation should not run for verify without -DwithEvals");
+    @Test
+    void createsWorkDirectoryWhenMissing() throws MojoExecutionException {
+        Path workDir = tempDir.resolve("evalfluxx");
+        TestEvalMojo mojo = new TestEvalMojo();
+        mojo.setWorkDirectory(workDir.toFile());
+
+        mojo.initializeWorkDirectory();
+
+        assertTrue(Files.isDirectory(workDir), "Work directory should be created when missing");
     }
 
     @Test
-    void verifyWithFlagRunsEvaluation() {
-        boolean shouldRun = EvalFluxXMojo.shouldRunEvaluation(List.of("verify"), true);
+    void leavesExistingWorkDirectoryUntouched() throws Exception {
+        Path workDir = tempDir.resolve("existing-evalfluxx");
+        Files.createDirectories(workDir);
+        TestEvalMojo mojo = new TestEvalMojo();
+        mojo.setWorkDirectory(workDir.toFile());
 
-        assertTrue(shouldRun, "Evaluation should run for verify when -DwithEvals is set");
+        mojo.initializeWorkDirectory();
+
+        assertTrue(Files.isDirectory(workDir), "Existing work directory should remain available");
     }
 
     @Test
-    void explicitGoalAlwaysRunsEvaluation() {
-        boolean shouldRun = EvalFluxXMojo.shouldRunEvaluation(Collections.singletonList("evalfluxx:eval"), false);
+    void executesWithWorkDirectoryInitialization() throws Exception {
+        Path workDir = tempDir.resolve("run-evalfluxx");
+        TestEvalMojo mojo = new TestEvalMojo();
+        mojo.setWorkDirectory(workDir.toFile());
+        mojo.setWithEvals(true);
 
-        assertTrue(shouldRun, "Explicit evalfluxx:eval invocation should always run evaluation");
+        mojo.execute();
+
+        assertTrue(Files.isDirectory(workDir), "Work directory should be created during eval execution");
+        assertTrue(mojo.initialized, "Initialization should be invoked during execution");
+        assertTrue(mojo.performedEvaluation, "Evaluation should run after initialization");
+    }
+
+    private static class TestEvalMojo extends EvalFluxXMojo {
+        private boolean performedEvaluation;
+        private boolean initialized;
+
+        @Override
+        protected void performEvaluation() {
+            this.performedEvaluation = true;
+        }
+
+        @Override
+        void initializeWorkDirectory() throws MojoExecutionException {
+            super.initializeWorkDirectory();
+            this.initialized = true;
+        }
     }
 }
