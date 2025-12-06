@@ -1,6 +1,6 @@
 # EvalFluxX Maven Plugin
 
-EvalFluxX definiert eine neue Maven-Lifecycle-Phase `evaluation` und ordnet sie dem Plugin-Goal `evalfluxx:eval` zu.
+EvalFluxX definiert eine neue Maven-Lifecycle-Phase `rag-evaluation` und ordnet sie dem Plugin-Goal `evalfluxx:eval` zu.
 Projekte, die das Plugin als Extension einbinden, können so Evaluierungsprozesse direkt im Build-Lifecycle ausführen.
 
 ## Voraussetzungen
