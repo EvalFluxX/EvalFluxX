@@ -1,6 +1,6 @@
 # EvalFluxX Maven Plugin
 
-EvalFluxX definiert eine neue Maven-Lifecycle-Phase `rag-evaluation` und ordnet sie dem Plugin-Goal `evalfluxx:run` zu.
+EvalFluxX definiert eine neue Maven-Lifecycle-Phase `evaluation` und ordnet sie dem Plugin-Goal `evalfluxx:eval` zu.
 Projekte, die das Plugin als Extension einbinden, können so Evaluierungsprozesse direkt im Build-Lifecycle ausführen.
 
 ## Voraussetzungen
@@ -31,6 +31,13 @@ Binde das Plugin als Extension in einem Projekt ein:
       <groupId>dev.evalfluxx</groupId>
       <artifactId>evalfluxx</artifactId>
       <version>1.0.0</version>
+      <executions>
+          <execution>
+              <goals>
+                  <goal>eval</goal>
+              </goals>
+          </execution>
+      </executions>
     </plugin>
   </plugins>
 </build>
@@ -39,7 +46,7 @@ Binde das Plugin als Extension in einem Projekt ein:
 Auslösen der Phase direkt:
 
 ```bash
-mvn evalfluxx:run
+mvn evalfluxx:eval
 ```
 
 Als Teil des Standard-Lifecycles (z. B. `verify`) kann die RAG-Evaluation optional aktiviert werden:
@@ -48,7 +55,7 @@ Als Teil des Standard-Lifecycles (z. B. `verify`) kann die RAG-Evaluation option
 mvn verify -DwithEvals
 ```
 
-Ohne das Property `-DwithEvals` wird während `verify` keine Evaluation gestartet. Das Goal `evalfluxx:run` wird immer
+Ohne das Property `-DwithEvals` wird während `verify` keine Evaluation gestartet. Das Goal `evalfluxx:eval` wird immer
 ausgeführt, wenn es explizit aufgerufen wird, unabhängig von gesetzten Properties.
 
 ### Beispiel: Eigener `Evaluator` mit `@Evaluation`
@@ -83,5 +90,5 @@ public class GreetingEvaluator extends Evaluator {
 }
 ```
 
-Lege den Evaluator z. B. unter `src/evaluation/java` ab. Bei `mvn evalfluxx:run` oder innerhalb
+Lege den Evaluator z. B. unter `src/evaluation/java` ab. Bei `mvn evalfluxx:eval` oder innerhalb
 von `mvn verify -DwithEvals` wird er über den `ServiceLoader` automatisch entdeckt und ausgeführt.

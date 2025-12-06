@@ -25,8 +25,7 @@ import java.util.ServiceLoader;
 /**
  * Mojo that will be bound to the custom rag-evaluation lifecycle phase.
  */
-@Mojo(name = "run", defaultPhase = LifecyclePhase.VERIFY,
-      requiresDependencyResolution = ResolutionScope.TEST)
+@Mojo(name = "eval", defaultPhase = LifecyclePhase.VERIFY, requiresDependencyResolution = ResolutionScope.TEST)
 public class EvalFluxXMojo extends AbstractMojo {
 
     @Parameter(property = "withEvals", defaultValue = "false")
@@ -42,7 +41,8 @@ public class EvalFluxXMojo extends AbstractMojo {
                 : Collections.emptyList();
 
         if (!shouldRunEvaluation(requestedGoals, withEvals)) {
-            getLog().info("EvalFluxX RAG Evaluation skipped. Enable it with -DwithEvals or run evalfluxx:run explicitly.");
+            getLog().info(
+                    "EvalFluxX RAG Evaluation skipped. Enable it with -DwithEvals or run evalfluxx:eval explicitly.");
             return;
         }
 
@@ -60,7 +60,7 @@ public class EvalFluxXMojo extends AbstractMojo {
             return false;
         }
         for (String goal : requestedGoals) {
-            if (goal != null && goal.contains("evalfluxx:run")) {
+            if (goal != null && goal.contains("evalfluxx:eval")) {
                 return true;
             }
         }
@@ -85,7 +85,8 @@ public class EvalFluxXMojo extends AbstractMojo {
             foundRunner = true;
             getLog().info("Executing EvaluationRunner: " + runner.getName());
             try {
-                EvaluationConfiguration defaultConfiguration = DefaultEvaluationConfiguration.empty("default", "Default");
+                EvaluationConfiguration defaultConfiguration = DefaultEvaluationConfiguration.empty("default",
+                        "Default");
                 runner.loadConfiguration(defaultConfiguration);
                 Collection<EvaluationConfiguration> configurations = runner.getConfigurations();
                 if (configurations.isEmpty()) {

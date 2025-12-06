@@ -26,8 +26,8 @@ class EvalFluxXMojoTest {
 
     @Test
     void explicitGoalAlwaysRunsEvaluation() {
-        boolean shouldRun = EvalFluxXMojo.shouldRunEvaluation(Collections.singletonList("evalfluxx:run"), false);
+        boolean shouldRun = EvalFluxXMojo.shouldRunEvaluation(Collections.singletonList("evalfluxx:eval"), false);
 
-        assertTrue(shouldRun, "Explicit evalfluxx:run invocation should always run evaluation");
+        assertTrue(shouldRun, "Explicit evalfluxx:eval invocation should always run evaluation");
     }
 }
