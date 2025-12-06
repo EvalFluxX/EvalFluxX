@@ -42,13 +42,14 @@ Auslösen der Phase direkt:
 mvn evalfluxx:run
 ```
 
-Als Teil des Standard-Lifecycles (z. B. `verify`):
+Als Teil des Standard-Lifecycles (z. B. `verify`) kann die RAG-Evaluation optional aktiviert werden:
 
 ```bash
-mvn verify
+mvn verify -DwithEvals
 ```
 
-Das Goal `evalfluxx:run` wird in beiden Fällen im Rahmen der neuen Phase `rag-evaluation` ausgeführt.
+Ohne das Property `-DwithEvals` wird während `verify` keine Evaluation gestartet. Das Goal `evalfluxx:run` wird immer
+ausgeführt, wenn es explizit aufgerufen wird, unabhängig von gesetzten Properties.
 
 ### Beispiel: Eigener `Evaluator` mit `@Evaluation`
 
@@ -83,4 +84,4 @@ public class GreetingEvaluator extends Evaluator {
 ```
 
 Lege den Evaluator z. B. unter `src/evaluation/java` ab. Bei `mvn evalfluxx:run` oder innerhalb
-von `mvn verify` wird er über den `ServiceLoader` automatisch entdeckt und ausgeführt.
+von `mvn verify -DwithEvals` wird er über den `ServiceLoader` automatisch entdeckt und ausgeführt.
