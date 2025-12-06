@@ -39,7 +39,7 @@ Binde das Plugin als Extension in einem Projekt ein:
 Auslösen der Phase direkt:
 
 ```bash
-mvn rag-evaluation
+mvn evalfluxx:run
 ```
 
 Als Teil des Standard-Lifecycles (z. B. `verify`):
@@ -82,5 +82,5 @@ public class GreetingEvaluator extends Evaluator {
 }
 ```
 
-Lege den Evaluator z. B. unter `src/evaluation/java` ab. Bei `mvn rag-evaluation` oder innerhalb
+Lege den Evaluator z. B. unter `src/evaluation/java` ab. Bei `mvn evalfluxx:run` oder innerhalb
 von `mvn verify` wird er über den `ServiceLoader` automatisch entdeckt und ausgeführt.
