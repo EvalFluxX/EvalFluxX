@@ -17,6 +17,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.execution.MavenSession;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -34,6 +35,9 @@ public class EvalFluxXMojo extends AbstractMojo {
     @Parameter(defaultValue = "${session}", readonly = true)
     private MavenSession session;
 
+    @Parameter(property = "evalfluxx.workDirectory", defaultValue = "${project.basedir}/src/evaluation/java")
+    protected File workDirectory;
+
     @Override
     public void execute() throws MojoExecutionException {
         Collection<String> requestedGoals = session != null && session.getRequest() != null
@@ -46,8 +50,28 @@ public class EvalFluxXMojo extends AbstractMojo {
             return;
         }
 
+        initializeWorkDirectory();
         getLog().info("EvalFluxX RAG Evaluation Phase executed.");
         performEvaluation();
+    }
+
+    void initializeWorkDirectory() throws MojoExecutionException {
+        if (workDirectory == null) {
+            throw new MojoExecutionException("Arbeitsverzeichnis ist nicht konfiguriert.");
+        }
+
+        if (workDirectory.exists()) {
+            getLog().debug("[EvalFluxX] Arbeitsverzeichnis existiert bereits: " + workDirectory.getAbsolutePath());
+            return;
+        }
+
+        if (workDirectory.mkdirs()) {
+            getLog().info("[EvalFluxX] Initialisiere Arbeitsverzeichnis unter: " + workDirectory.getAbsolutePath());
+            return;
+        }
+
+        throw new MojoExecutionException(
+                "Arbeitsverzeichnis konnte nicht angelegt werden: " + workDirectory.getAbsolutePath());
     }
 
     static boolean shouldRunEvaluation(Collection<String> requestedGoals, boolean withEvals) {
@@ -67,7 +91,15 @@ public class EvalFluxXMojo extends AbstractMojo {
         return false;
     }
 
-    private void performEvaluation() {
+    void setWorkDirectory(File workDirectory) {
+        this.workDirectory = workDirectory;
+    }
+
+    void setWithEvals(boolean withEvals) {
+        this.withEvals = withEvals;
+    }
+
+    protected void performEvaluation() {
         EvaluationResultCollectorHolder collectorHolder = EvaluationResultCollectorHolder.getInstance();
         ServiceLoader<EvaluationResultCollector> collectorLoader = ServiceLoader.load(EvaluationResultCollector.class,
                 Thread.currentThread().getContextClassLoader());
