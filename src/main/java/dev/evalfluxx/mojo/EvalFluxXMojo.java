@@ -13,7 +13,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.execution.MavenSession;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,14 +25,46 @@ import java.util.ServiceLoader;
 /**
  * Mojo that will be bound to the custom rag-evaluation lifecycle phase.
  */
-@Mojo(name = "run", defaultPhase = LifecyclePhase.VERIFY,
-      requiresDependencyResolution = ResolutionScope.TEST)
+@Mojo(name = "eval", defaultPhase = LifecyclePhase.VERIFY, requiresDependencyResolution = ResolutionScope.TEST)
 public class EvalFluxXMojo extends AbstractMojo {
+
+    @Parameter(property = "withEvals", defaultValue = "false")
+    private boolean withEvals;
+
+    @Parameter(defaultValue = "${session}", readonly = true)
+    private MavenSession session;
 
     @Override
     public void execute() throws MojoExecutionException {
+        Collection<String> requestedGoals = session != null && session.getRequest() != null
+                ? session.getRequest().getGoals()
+                : Collections.emptyList();
+
+        if (!shouldRunEvaluation(requestedGoals, withEvals)) {
+            getLog().info(
+                    "EvalFluxX RAG Evaluation skipped. Enable it with -DwithEvals or run evalfluxx:eval explicitly.");
+            return;
+        }
+
         getLog().info("EvalFluxX RAG Evaluation Phase executed.");
         performEvaluation();
+    }
+
+    static boolean shouldRunEvaluation(Collection<String> requestedGoals, boolean withEvals) {
+        boolean explicitlyRequested = isExplicitInvocation(requestedGoals);
+        return explicitlyRequested || withEvals;
+    }
+
+    private static boolean isExplicitInvocation(Collection<String> requestedGoals) {
+        if (requestedGoals == null) {
+            return false;
+        }
+        for (String goal : requestedGoals) {
+            if (goal != null && goal.contains("evalfluxx:eval")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void performEvaluation() {
@@ -51,7 +85,8 @@ public class EvalFluxXMojo extends AbstractMojo {
             foundRunner = true;
             getLog().info("Executing EvaluationRunner: " + runner.getName());
             try {
-                EvaluationConfiguration defaultConfiguration = DefaultEvaluationConfiguration.empty("default", "Default");
+                EvaluationConfiguration defaultConfiguration = DefaultEvaluationConfiguration.empty("default",
+                        "Default");
                 runner.loadConfiguration(defaultConfiguration);
                 Collection<EvaluationConfiguration> configurations = runner.getConfigurations();
                 if (configurations.isEmpty()) {
