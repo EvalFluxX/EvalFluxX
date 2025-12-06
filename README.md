@@ -3,15 +3,6 @@
 EvalFluxX definiert eine neue Maven-Lifecycle-Phase `rag-evaluation` und ordnet sie dem Plugin-Goal `evalfluxx:run` zu.
 Projekte, die das Plugin als Extension einbinden, können so Evaluierungsprozesse direkt im Build-Lifecycle ausführen.
 
-## Projektstruktur
-```
-evalfluxx/
-    pom.xml
-    src/main/java/dev/evalfluxx/mojo/EvalFluxXMojo.java
-    src/main/resources/META-INF/maven/lifecycle.xml
-    README.md
-```
-
 ## Voraussetzungen
 - Java 21
 - Maven 3.9+
