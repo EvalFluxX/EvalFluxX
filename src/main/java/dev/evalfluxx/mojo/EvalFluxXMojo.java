@@ -100,16 +100,16 @@ public class EvalFluxXMojo extends AbstractMojo {
     }
 
     protected void performEvaluation() {
+        // Initialiesiere EvaluationResultCollector
         EvaluationResultCollectorHolder collectorHolder = EvaluationResultCollectorHolder.getInstance();
         ServiceLoader<EvaluationResultCollector> collectorLoader = ServiceLoader.load(EvaluationResultCollector.class,
                 Thread.currentThread().getContextClassLoader());
         Iterator<EvaluationResultCollector> collectorIterator = collectorLoader.iterator();
         while (collectorIterator.hasNext()) {
-            EvaluationResultCollectorHolder.register(collectorIterator.next());
+            collectorHolder.register(collectorIterator.next());
         }
-        MavenLogEvaluationResultCollector mavenLogCollector = new MavenLogEvaluationResultCollector(getLog());
-        EvaluationResultCollectorHolder.register(mavenLogCollector);
 
+        // Lade und führe EvaluationRunner aus
         ServiceLoader<EvaluationRunner> loader = ServiceLoader.load(EvaluationRunner.class,
                 Thread.currentThread().getContextClassLoader());
         boolean foundRunner = false;
@@ -126,7 +126,7 @@ public class EvalFluxXMojo extends AbstractMojo {
                 }
 
                 for (EvaluationConfiguration configuration : configurations) {
-                    EvaluationContext context = new DefaultEvaluationContext(configuration, collectorHolder);
+                    EvaluationContext context = new DefaultEvaluationContext(configuration);
                     Collection<EvaluationSet> evaluationSets = runner.getEvaluationSets();
                     if (evaluationSets.isEmpty()) {
                         getLog().warn("EvaluationRunner returned no EvaluationSets: " + runner.getName());

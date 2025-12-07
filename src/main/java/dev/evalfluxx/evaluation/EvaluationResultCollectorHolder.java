@@ -6,12 +6,13 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Simple holder to expose the active {@link EvaluationResultCollector} as a singleton service for evaluations.
+ * Simple holder to expose the active {@link EvaluationResultCollector} as a
+ * singleton service for evaluations.
  */
 public final class EvaluationResultCollectorHolder implements EvaluationResultCollector {
 
     private static final EvaluationResultCollectorHolder INSTANCE = new EvaluationResultCollectorHolder();
-    private static final List<EvaluationResultCollector> COLLECTORS = new CopyOnWriteArrayList<>();
+    private final List<EvaluationResultCollector> collectors = new CopyOnWriteArrayList<>();
 
     private EvaluationResultCollectorHolder() {
     }
@@ -23,28 +24,29 @@ public final class EvaluationResultCollectorHolder implements EvaluationResultCo
     /**
      * Register a collector instance that should receive evaluation results.
      */
-    public static void register(EvaluationResultCollector collector) {
+    public void register(EvaluationResultCollector collector) {
         Objects.requireNonNull(collector, "collector");
         if (collector == INSTANCE) {
             return;
         }
-        if (!COLLECTORS.contains(collector)) {
-            COLLECTORS.add(collector);
+        if (!collectors.contains(collector)) {
+            collectors.add(collector);
         }
     }
 
     /**
      * Remove a collector that should no longer receive evaluation results.
      */
-    public static void unregister(EvaluationResultCollector collector) {
-        COLLECTORS.remove(collector);
+    public void unregister(EvaluationResultCollector collector) {
+        collectors.remove(collector);
     }
 
     /**
-     * Obtain a broadcasting collector that forwards records to every registered collector.
+     * Obtain a broadcasting collector that forwards records to every registered
+     * collector.
      */
-    public static Optional<EvaluationResultCollector> get() {
-        if (COLLECTORS.isEmpty()) {
+    public Optional<EvaluationResultCollector> get() {
+        if (collectors.isEmpty()) {
             return Optional.empty();
         }
         return Optional.of(INSTANCE);
@@ -55,7 +57,7 @@ public final class EvaluationResultCollectorHolder implements EvaluationResultCo
      */
     @Override
     public void record(EvaluationRecord record) {
-        for (EvaluationResultCollector collector : COLLECTORS) {
+        for (EvaluationResultCollector collector : collectors) {
             collector.record(record);
         }
     }
@@ -63,7 +65,7 @@ public final class EvaluationResultCollectorHolder implements EvaluationResultCo
     /**
      * @return immutable snapshot of currently registered collectors
      */
-    public static List<EvaluationResultCollector> collectors() {
-        return List.copyOf(COLLECTORS);
+    public List<EvaluationResultCollector> collectors() {
+        return List.copyOf(collectors);
     }
 }

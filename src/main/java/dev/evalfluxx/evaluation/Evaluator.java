@@ -8,29 +8,18 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Base implementation of an {@link EvaluationRunner} that turns annotated methods into {@link EvaluationSet}s.
+ * Base implementation of an {@link EvaluationRunner} that turns annotated
+ * methods into {@link EvaluationSet}s.
  */
 public abstract class Evaluator implements EvaluationRunner {
-
     private final List<EvaluationSet> evaluationSets = new ArrayList<>();
-    private EvaluationConfiguration configuration;
-
-    @Override
-    public void loadConfiguration(EvaluationConfiguration configuration) throws EvaluationException {
-        evaluationSets.clear();
-        this.configuration = configuration;
-        for (Method method : getEvaluationMethods()) {
-            evaluationSets.add(createEvaluationSet(method));
-        }
-    }
-
-    @Override
-    public Collection<EvaluationConfiguration> getConfigurations() {
-        return configuration == null ? Collections.emptyList() : Collections.singletonList(configuration);
-    }
 
     @Override
     public Collection<EvaluationSet> getEvaluationSets() {
+        if (evaluationSets == null)
+            for (Method method : getEvaluationMethods()) {
+                evaluationSets.add(createEvaluationSet(method));
+            }
         return Collections.unmodifiableList(evaluationSets);
     }
 

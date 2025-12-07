@@ -18,19 +18,30 @@ mvn clean install
 Binde das Plugin als Extension in einem Projekt ein:
 
 ```xml
+
+<properties>
+    <evalfluxx.version>1.0.0</evalfluxx.version>
+</properties>
+<dependencies>
+    <dependency>
+        <groupId>dev.evalfluxx</groupId>
+        <artifactId>evalfluxx</artifactId>
+        <version>${evalfluxx.version}</version>
+    </dependency>
+</dependencies>
 <build>
   <extensions>
     <extension>
       <groupId>dev.evalfluxx</groupId>
       <artifactId>evalfluxx</artifactId>
-      <version>1.0.0</version>
+      <version>${evalfluxx.version}</version>
     </extension>
   </extensions>
   <plugins>
     <plugin>
       <groupId>dev.evalfluxx</groupId>
       <artifactId>evalfluxx</artifactId>
-      <version>1.0.0</version>
+      <version>${evalfluxx.version}</version>
       <executions>
           <execution>
               <goals>

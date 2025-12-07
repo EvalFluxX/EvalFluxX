@@ -8,13 +8,9 @@ import java.util.Objects;
 public class DefaultEvaluationContext implements EvaluationContext {
 
     private final EvaluationConfiguration configuration;
-    private final EvaluationResultCollector resultCollector;
 
-    public DefaultEvaluationContext(EvaluationConfiguration configuration, EvaluationResultCollector resultCollector) {
+    public DefaultEvaluationContext(EvaluationConfiguration configuration) {
         this.configuration = Objects.requireNonNull(configuration, "configuration");
-        Objects.requireNonNull(resultCollector, "resultCollector");
-        EvaluationResultCollectorHolder.register(resultCollector);
-        this.resultCollector = EvaluationResultCollectorHolder.getInstance();
     }
 
     @Override
@@ -24,6 +20,6 @@ public class DefaultEvaluationContext implements EvaluationContext {
 
     @Override
     public EvaluationResultCollector resultCollector() {
-        return resultCollector;
+        return EvaluationResultCollectorHolder.getInstance();
     }
 }
