@@ -1,0 +1,58 @@
+package dev.evalfluxx.mojo;
+
+import java.io.File;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+
+@Mojo(name = "add-source", defaultPhase = LifecyclePhase.INITIALIZE)
+public class EvalFluxXScanMojo extends AbstractMojo {
+
+    @Parameter(property = "evalfluxx.workDirectory", defaultValue = "${project.basedir}/src/evaluation/java")
+    protected File workDirectory;
+
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
+    private MavenProject project;
+
+    void setWorkDirectory(File workDirectory) {
+        this.workDirectory = workDirectory;
+    }
+
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        // Ordner anlegen (falls nicht vorhanden)
+        initializeWorkDirectory();
+
+        // Maven 4: Source-Directory PROGRAMMATISCH ergänzen
+        project.addCompileSourceRoot(workDirectory.getAbsolutePath());
+
+        getLog().info("Added evaluation source directory: " + workDirectory.getAbsolutePath());
+
+        getLog().info("Current source directory: " + project.getModel().getBuild().getSourceDirectory());
+        getLog().info("Current test-source directory: " + project.getModel().getBuild().getTestSourceDirectory());
+    }
+
+    void initializeWorkDirectory() throws MojoExecutionException {
+        if (workDirectory == null) {
+            throw new MojoExecutionException("Arbeitsverzeichnis ist nicht konfiguriert.");
+        }
+
+        if (workDirectory.exists()) {
+            getLog().debug("[EvalFluxX] Arbeitsverzeichnis existiert bereits: " + workDirectory.getAbsolutePath());
+            return;
+        }
+
+        if (workDirectory.mkdirs()) {
+            getLog().info("[EvalFluxX] Initialisiere Arbeitsverzeichnis unter: " + workDirectory.getAbsolutePath());
+            return;
+        }
+
+        throw new MojoExecutionException(
+                "Arbeitsverzeichnis konnte nicht angelegt werden: " + workDirectory.getAbsolutePath());
+    }
+}
